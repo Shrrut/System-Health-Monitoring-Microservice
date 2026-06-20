@@ -1,0 +1,26 @@
+name: Local CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-locally:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: docker build -t system-health-api .
+
+      - name: Stop old container
+        run: docker stop health-api || true
+
+      - name: Remove old container
+        run: docker rm health-api || true
+
+      - name: Run new container
+        run: docker run -d -p 8080:8000 --name health-api system-health-api
